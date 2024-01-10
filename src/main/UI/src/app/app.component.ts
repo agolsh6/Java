@@ -15,6 +15,9 @@ import {map} from "rxjs/operators";
 })
 export class AppComponent implements OnInit{
 
+  welcomeMessageEng$!: Observable<string>;
+  welcomeMessageFr$! : Observable<string>
+
   constructor(private httpClient:HttpClient){}
 
   private baseURL:string='http://localhost:8080';
@@ -29,6 +32,11 @@ export class AppComponent implements OnInit{
   currentCheckOutVal!:string;
 
     ngOnInit(){
+
+      this.welcomeMessageFr$ = this.httpClient.get(this.baseURL + '/welcome?lang=fr-CA', {responseType: 'text'} )
+      this.welcomeMessageEng$ = this.httpClient.get(this.baseURL + '/welcome?lang=en-US', {responseType: 'text'} )
+
+
       this.roomsearch= new FormGroup({
         checkin: new FormControl(' '),
         checkout: new FormControl(' ')
@@ -49,10 +57,15 @@ export class AppComponent implements OnInit{
     onSubmit({value,valid}:{value:Roomsearch,valid:boolean}){
       this.getAll().subscribe(
 
-        rooms => {console.log(Object.values(rooms)[0]);this.rooms=<Room[]>Object.values(rooms)[0]; }
+        rooms => {console.log(Object.values(rooms)[0]);this.rooms=<Room[]>Object.values(rooms)[0];
+
+          this.rooms.forEach( room => { room.priceCAD = room.price; room.priceEUR = room.price})
+
+        }
 
 
       );
+
     }
     reserveRoom(value:string){
       this.request = new ReserveRoomRequest(value, this.currentCheckInVal, this.currentCheckOutVal);
@@ -99,9 +112,12 @@ export interface Room{
   id:string;
   roomNumber:string;
   price:string;
+  priceCAD:string;
+  priceEUR:string;
   links:string;
 
 }
+
 export class ReserveRoomRequest {
   roomId:string;
   checkin:string;
