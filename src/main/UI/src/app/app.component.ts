@@ -59,7 +59,6 @@ export class AppComponent implements OnInit{
 
         rooms => {console.log(Object.values(rooms)[0]);this.rooms=<Room[]>Object.values(rooms)[0];
 
-          this.rooms.forEach( room => { room.priceCAD = room.price; room.priceEUR = room.price})
 
         }
 
