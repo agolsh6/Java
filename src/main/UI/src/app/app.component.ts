@@ -30,12 +30,14 @@ export class AppComponent implements OnInit{
   request!:ReserveRoomRequest;
   currentCheckInVal!:string;
   currentCheckOutVal!:string;
+  convertedTimes: string = '';
 
     ngOnInit(){
 
       this.welcomeMessageFr$ = this.httpClient.get(this.baseURL + '/welcome?lang=fr-CA', {responseType: 'text'} )
       this.welcomeMessageEng$ = this.httpClient.get(this.baseURL + '/welcome?lang=en-US', {responseType: 'text'} )
 
+      this.getConvertedTimes();
 
       this.roomsearch= new FormGroup({
         checkin: new FormControl(' '),
@@ -59,6 +61,7 @@ export class AppComponent implements OnInit{
 
         rooms => {console.log(Object.values(rooms)[0]);this.rooms=<Room[]>Object.values(rooms)[0];
 
+          this.rooms.forEach( room => { room.priceCAD = room.price; room.priceEUR = room.price})
 
         }
 
@@ -95,7 +98,17 @@ export class AppComponent implements OnInit{
        return this.httpClient.get(this.baseURL + '/room/reservation/v1?checkin='+ this.currentCheckInVal + '&checkout='+this.currentCheckOutVal, {responseType: 'json'});
     }
 
+  private getConvertedTimes() {
+    this.httpClient.get('http://localhost:8080/convert', {responseType: 'text'}).subscribe(
+      (res: string) => {
+        this.convertedTimes = res;
+      },
+      (error: any) => {
+        console.error(error);
+      }
+    );
   }
+}
 
 
 
